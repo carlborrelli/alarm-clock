@@ -1,0 +1,31 @@
+# Dockerfile for kiosk backend server
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements
+COPY setup/requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Copy application files
+COPY app /app
+
+# Build React frontend
+WORKDIR /app/kiosk-ui
+RUN npm install && npm run build
+
+# Set working directory for server
+WORKDIR /app
+
+# Expose port
+EXPOSE 3000
+
+# Run kiosk server
+CMD ["python3", "/app/scripts/kiosk_server.py"]

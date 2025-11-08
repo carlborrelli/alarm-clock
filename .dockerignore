@@ -1,0 +1,43 @@
+# Git files
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Node modules (installed in container)
+node_modules/
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+
+# Build artifacts
+app/kiosk-ui/build/
+dist/
+*.log
+
+# Config files (will be mounted as volumes)
+.env
+app/config/*.json
+app/config/*.yaml
+app/config/.wake_detected

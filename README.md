@@ -22,6 +22,32 @@ This project uses a **Hybrid Pi + Home Assistant Server** architecture:
 - **Protocol**: Wyoming for voice pipeline
 - **Latency**: 800-1200ms wake word to response
 
+## Testing Without a Raspberry Pi
+
+Don't have a Pi yet? You can test and develop on any Linux machine, Proxmox, or Docker:
+
+### Quick Test with Docker
+
+```bash
+git clone https://github.com/yourusername/bedside-voice-clock.git
+cd bedside-voice-clock
+cp .env.example .env
+# Edit .env with your Home Assistant URL
+./dev-start.sh
+```
+
+Access the UI at http://localhost:3001
+
+**What works:** Kiosk UI, alarm logic, Home Assistant integration, backend APIs
+**What doesn't:** Real wake word detection (uses mock), audio playback
+
+### Full Testing on Proxmox
+
+See [docs/PROXMOX_TESTING.md](docs/PROXMOX_TESTING.md) for detailed instructions on:
+- LXC containers with audio passthrough
+- Full VM testing with Pi OS
+- Development workflow options
+
 ## Quick Start
 
 ### Prerequisites

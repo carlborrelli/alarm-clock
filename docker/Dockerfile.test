@@ -1,0 +1,23 @@
+# Dockerfile for running tests
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    jq \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements
+COPY setup/requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt pytest
+
+# Copy test files
+COPY tests /tests
+COPY app /app
+
+WORKDIR /tests
+
+CMD ["/bin/bash"]

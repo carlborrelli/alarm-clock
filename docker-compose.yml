@@ -1,0 +1,78 @@
+# Docker Compose setup for development and testing
+# This runs the core services without requiring Pi hardware
+
+version: '3.8'
+
+services:
+  # Kiosk backend server
+  kiosk-backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kiosk
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app/kiosk-ui:/app/kiosk-ui
+      - ./app/config:/app/config
+    environment:
+      - HA_URL=${HA_URL:-http://homeassistant.local:8123}
+      - HA_TOKEN=${HA_TOKEN:-your_token_here}
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  # Mock wake word service (for testing without microphone)
+  wakeword-mock:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+    command: python3 /app/scripts/wakeword_mock.py
+    volumes:
+      - ./app:/app
+    environment:
+      - MOCK_MODE=true
+    restart: unless-stopped
+
+  # Alarm fallback service
+  alarm-fallback:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+    command: python3 /app/scripts/alarm_fallback.py
+    volumes:
+      - ./app:/app
+      - ./app/config:/app/config
+    restart: unless-stopped
+
+  # Development UI with hot reload
+  kiosk-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kiosk-dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./app/kiosk-ui:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_HA_URL=${HA_URL:-http://homeassistant.local:8123}
+      - REACT_APP_HA_TOKEN=${HA_TOKEN:-}
+    command: npm start
+    stdin_open: true
+    tty: true
+
+  # Testing container
+  test-runner:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+    volumes:
+      - ./tests:/tests
+      - ./app:/app
+    profiles:
+      - test
+    command: /bin/bash
+
+networks:
+  default:
+    name: bedside-clock-net
