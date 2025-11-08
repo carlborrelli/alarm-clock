@@ -22,33 +22,54 @@ This project uses a **Hybrid Pi + Home Assistant Server** architecture:
 - **Protocol**: Wyoming for voice pipeline
 - **Latency**: 800-1200ms wake word to response
 
-## Testing Without a Raspberry Pi
+## Quick Start - Ubuntu LXC (Recommended for Testing)
 
-Don't have a Pi yet? You can test and develop on any Linux machine, Proxmox, or Docker:
+**Don't have a Raspberry Pi? Test everything in a Proxmox LXC container!**
 
-### Quick Test with Docker
+### 1. Create Ubuntu LXC Container in Proxmox
+- Template: Ubuntu 22.04
+- RAM: 2GB, CPU: 2 cores, Disk: 16GB
+- **Important:** Unprivileged = NO (need privileged for audio)
+
+### 2. One-Command Install
+
+**Copy and paste this into your LXC console:**
 
 ```bash
-git clone https://github.com/yourusername/bedside-voice-clock.git
-cd bedside-voice-clock
-cp .env.example .env
-# Edit .env with your Home Assistant URL
-./dev-start.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/carlborrelli/alarm-clock/claude/test-connection-011CUumxkd9Hz4Zo9jsKuBLn/quick-install.sh)
 ```
 
-Access the UI at http://localhost:3001
+Wait 5-10 minutes. Done! ✨
 
-**What works:** Kiosk UI, alarm logic, Home Assistant integration, backend APIs
-**What doesn't:** Real wake word detection (uses mock), audio playback
+**Full LXC setup guide:** [LXC_INSTALL.md](LXC_INSTALL.md)
 
-### Full Testing on Proxmox
+**What works in LXC:**
+- ✅ All features except GPU acceleration
+- ✅ Real audio (with passthrough)
+- ✅ Wake word detection
+- ✅ Spotify Connect
+- ✅ Full testing environment
 
-See [docs/PROXMOX_TESTING.md](docs/PROXMOX_TESTING.md) for detailed instructions on:
-- LXC containers with audio passthrough
-- Full VM testing with Pi OS
-- Development workflow options
+### 3. Update Anytime
 
-## Quick Start
+```bash
+cd ~/bedside-voice-clock
+./update.sh
+```
+
+### 4. Live Development with Claude Code
+
+From inside your container:
+```bash
+cd ~/bedside-voice-clock
+claude
+```
+
+Claude can edit configs, restart services, debug issues, and make changes on the fly!
+
+---
+
+## Installation on Raspberry Pi
 
 ### Prerequisites
 
