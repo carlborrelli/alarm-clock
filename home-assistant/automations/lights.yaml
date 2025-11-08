@@ -1,0 +1,71 @@
+# Light Control Automations for Bedside Voice Clock
+
+# ============================================
+# LIGHT CONTROL
+# ============================================
+
+# Turn on lights
+- id: bedside_light_on
+  alias: "Bedside: Turn On Light"
+  trigger:
+    - platform: conversation
+      command:
+        - "TurnOnLight"
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: "light.{{ trigger.slots.room | replace(' ', '_') }}"
+
+# Turn off lights
+- id: bedside_light_off
+  alias: "Bedside: Turn Off Light"
+  trigger:
+    - platform: conversation
+      command:
+        - "TurnOffLight"
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: "light.{{ trigger.slots.room | replace(' ', '_') }}"
+
+# Set light brightness
+- id: bedside_light_brightness
+  alias: "Bedside: Set Light Brightness"
+  trigger:
+    - platform: conversation
+      command:
+        - "SetLightBrightness"
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: "light.{{ trigger.slots.room | replace(' ', '_') }}"
+      data:
+        brightness_pct: "{{ trigger.slots.brightness }}"
+
+# Turn off all lights
+- id: bedside_all_lights_off
+  alias: "Bedside: All Lights Off"
+  trigger:
+    - platform: conversation
+      command:
+        - "AllLightsOff"
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: all
+
+# ============================================
+# SCENE ACTIVATION
+# ============================================
+
+# Activate scenes
+- id: bedside_activate_scene
+  alias: "Bedside: Activate Scene"
+  trigger:
+    - platform: conversation
+      command:
+        - "ActivateScene"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "scene.{{ trigger.slots.scene | replace(' ', '_') }}"

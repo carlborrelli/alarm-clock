@@ -1,0 +1,110 @@
+# Calendar and Information Automations for Bedside Voice Clock
+
+# ============================================
+# CALENDAR & SCHEDULE
+# ============================================
+
+# Get calendar events
+- id: bedside_get_calendar
+  alias: "Bedside: Get Calendar Events"
+  trigger:
+    - platform: conversation
+      command:
+        - "GetCalendar"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: >
+          {% set when = trigger.slots.when | default('today') %}
+          {% set events = state_attr('calendar.personal', 'events') | default([]) %}
+          {% if when == 'today' %}
+            {% set filtered = events | selectattr('start', 'search', now().strftime('%Y-%m-%d')) | list %}
+          {% elif when == 'tomorrow' %}
+            {% set tomorrow = (now() + timedelta(days=1)).strftime('%Y-%m-%d') %}
+            {% set filtered = events | selectattr('start', 'search', tomorrow) | list %}
+          {% else %}
+            {% set filtered = events %}
+          {% endif %}
+
+          {% if filtered | length > 0 %}
+            You have {{ filtered | length }} event{{ 's' if filtered | length > 1 else '' }} {{ when }}.
+            {% for event in filtered[:3] %}
+              {{ event.summary }} at {{ event.start | timestamp_custom('%I:%M %p') }}.
+            {% endfor %}
+          {% else %}
+            You have no events {{ when }}.
+          {% endif %}
+
+# ============================================
+# WEATHER
+# ============================================
+
+# Get current weather
+- id: bedside_get_weather
+  alias: "Bedside: Get Weather"
+  trigger:
+    - platform: conversation
+      command:
+        - "GetWeather"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: >
+          The current temperature is {{ state_attr('weather.home', 'temperature') }} degrees.
+          Conditions are {{ states('weather.home') }}.
+
+# Get weather forecast
+- id: bedside_get_forecast
+  alias: "Bedside: Get Forecast"
+  trigger:
+    - platform: conversation
+      command:
+        - "GetForecast"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: >
+          {% set when = trigger.slots.when | default('today') %}
+          {% set forecast = state_attr('weather.home', 'forecast') | default([]) %}
+          {% if when == 'today' and forecast | length > 0 %}
+            {% set today = forecast[0] %}
+            Today's forecast: {{ today.condition }}, high of {{ today.temperature }} degrees.
+          {% elif when == 'tomorrow' and forecast | length > 1 %}
+            {% set tomorrow = forecast[1] %}
+            Tomorrow's forecast: {{ tomorrow.condition }}, high of {{ tomorrow.temperature }} degrees.
+          {% else %}
+            Forecast information is not available.
+          {% endif %}
+
+# ============================================
+# TIME & DATE
+# ============================================
+
+# Get current time
+- id: bedside_get_time
+  alias: "Bedside: Get Time"
+  trigger:
+    - platform: conversation
+      command:
+        - "GetTime"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: "The current time is {{ now().strftime('%I:%M %p') }}"
+
+# Get current date
+- id: bedside_get_date
+  alias: "Bedside: Get Date"
+  trigger:
+    - platform: conversation
+      command:
+        - "GetDate"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: "Today is {{ now().strftime('%A, %B %d, %Y') }}"

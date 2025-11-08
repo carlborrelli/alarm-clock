@@ -1,0 +1,162 @@
+# Lovelace Dashboard for Bedside Voice Clock Management
+# This dashboard can be used on your phone or computer to manage the bedside clock
+
+title: Bedside Clock
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:alarm
+    cards:
+      # Current Status
+      - type: entities
+        title: System Status
+        entities:
+          - entity: sensor.bedside_clock_status
+            name: Status
+          - entity: binary_sensor.bedside_clock_wake_word
+            name: Wake Word Service
+          - entity: binary_sensor.bedside_clock_satellite
+            name: Voice Satellite
+          - entity: media_player.bedside_clock
+            name: Spotify
+
+      # Alarms Section
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## ⏰ Alarms"
+
+          # Alarm 1
+          - type: entities
+            entities:
+              - entity: input_boolean.alarm_1_enabled
+                name: Alarm 1 Enabled
+              - entity: input_datetime.alarm_1
+                name: Time
+              - entity: input_select.alarm_1_days
+                name: Days
+
+          # Alarm 2
+          - type: entities
+            entities:
+              - entity: input_boolean.alarm_2_enabled
+                name: Alarm 2 Enabled
+              - entity: input_datetime.alarm_2
+                name: Time
+              - entity: input_select.alarm_2_days
+                name: Days
+
+          # Alarm 3
+          - type: entities
+            entities:
+              - entity: input_boolean.alarm_3_enabled
+                name: Alarm 3 Enabled
+              - entity: input_datetime.alarm_3
+                name: Time
+              - entity: input_select.alarm_3_days
+                name: Days
+
+      # Quick Actions
+      - type: grid
+        cards:
+          - type: button
+            entity: input_button.stop_alarm
+            name: Stop Alarm
+            icon: mdi:alarm-off
+            tap_action:
+              action: call-service
+              service: input_button.press
+              service_data:
+                entity_id: input_button.stop_alarm
+
+          - type: button
+            entity: scene.night_mode
+            name: Night Mode
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.night_mode
+
+          - type: button
+            entity: scene.morning
+            name: Morning Mode
+            icon: mdi:weather-sunny
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.morning
+
+  - title: Calendar & Weather
+    path: info
+    icon: mdi:calendar
+    cards:
+      # Calendar
+      - type: calendar
+        entities:
+          - calendar.personal
+
+      # Weather
+      - type: weather-forecast
+        entity: weather.home
+        forecast_type: daily
+
+  - title: Media
+    path: media
+    icon: mdi:spotify
+    cards:
+      # Spotify Control
+      - type: media-control
+        entity: media_player.bedside_clock
+
+      # Volume Control
+      - type: entities
+        title: Volume
+        entities:
+          - entity: media_player.bedside_clock
+            type: custom:slider-entity-row
+            attribute: volume_level
+            name: Volume
+
+  - title: Settings
+    path: settings
+    icon: mdi:cog
+    cards:
+      # Display Settings
+      - type: entities
+        title: Display Settings
+        entities:
+          - entity: input_number.display_brightness
+            name: Brightness
+          - entity: input_number.display_dim_brightness
+            name: Dim Brightness
+          - entity: input_datetime.dim_start_time
+            name: Dim Start Time
+          - entity: input_datetime.dim_end_time
+            name: Dim End Time
+
+      # Voice Settings
+      - type: entities
+        title: Voice Settings
+        entities:
+          - entity: input_select.wake_word
+            name: Wake Word
+          - entity: input_number.wake_word_sensitivity
+            name: Sensitivity
+          - entity: input_boolean.chatgpt_fallback
+            name: ChatGPT Fallback
+
+      # Restart Services
+      - type: entities
+        title: Service Control
+        entities:
+          - entity: button.restart_wakeword
+            name: Restart Wake Word
+          - entity: button.restart_satellite
+            name: Restart Satellite
+          - entity: button.restart_kiosk
+            name: Restart Kiosk
+          - entity: button.reboot_pi
+            name: Reboot Pi

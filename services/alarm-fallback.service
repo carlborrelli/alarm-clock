@@ -1,0 +1,31 @@
+[Unit]
+Description=Local Alarm Failsafe Service
+After=sound.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User={USER}
+WorkingDirectory={PROJECT_DIR}
+Environment="PATH={HOME}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+# Run the alarm fallback script
+ExecStart={PROJECT_DIR}/venv/bin/python3 {PROJECT_DIR}/app/scripts/alarm_fallback.py
+
+# Restart on failure - critical service!
+Restart=always
+RestartSec=5
+
+# High priority for alarms
+Nice=-15
+CPUQuota=20%
+MemoryMax=100M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alarm-fallback
+
+[Install]
+WantedBy=multi-user.target

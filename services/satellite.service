@@ -1,0 +1,32 @@
+[Unit]
+Description=Wyoming Satellite Service
+After=network-online.target sound.target wakeword.service
+Wants=network-online.target sound.target
+Requires=wakeword.service
+
+[Service]
+Type=simple
+User={USER}
+WorkingDirectory={PROJECT_DIR}
+Environment="PATH={HOME}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+# Run the Wyoming satellite script
+ExecStart={PROJECT_DIR}/venv/bin/python3 {PROJECT_DIR}/app/scripts/satellite_runner.py
+
+# Restart on failure
+Restart=always
+RestartSec=10
+
+# Resource limits
+Nice=0
+CPUQuota=50%
+MemoryMax=400M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=satellite
+
+[Install]
+WantedBy=multi-user.target

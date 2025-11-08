@@ -1,0 +1,28 @@
+[Unit]
+Description=Bedside Clock Kiosk UI
+After=graphical.target network.target
+Wants=graphical.target
+
+[Service]
+Type=simple
+User={USER}
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY={HOME}/.Xauthority"
+Environment="NODE_ENV=production"
+WorkingDirectory={PROJECT_DIR}/app/kiosk-ui
+
+# Start the kiosk backend server and launch browser
+ExecStartPre=/bin/sleep 5
+ExecStart=/bin/bash -c 'cd {PROJECT_DIR}/app/kiosk-ui && {PROJECT_DIR}/venv/bin/python3 {PROJECT_DIR}/app/scripts/kiosk_server.py & sleep 3 && {PROJECT_DIR}/app/scripts/launch_kiosk.sh'
+
+# Restart on failure
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kiosk
+
+[Install]
+WantedBy=graphical.target

@@ -1,0 +1,189 @@
+# Home Assistant Automations for Bedside Voice Clock Alarms
+# Add these to your Home Assistant configuration.yaml or automations.yaml
+
+# ============================================
+# ALARM MANAGEMENT
+# ============================================
+
+# Handle "Set Alarm" intent
+- id: bedside_set_alarm
+  alias: "Bedside: Set Alarm"
+  trigger:
+    - platform: conversation
+      command:
+        - "SetAlarm"
+  action:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.alarm_1
+      data:
+        time: "{{ trigger.slots.time }}"
+
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alarm_1_enabled
+
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: "Alarm set for {{ trigger.slots.time }}"
+
+# Handle "Cancel Alarm" intent
+- id: bedside_cancel_alarm
+  alias: "Bedside: Cancel Alarm"
+  trigger:
+    - platform: conversation
+      command:
+        - "CancelAlarm"
+  action:
+    - choose:
+        # Cancel specific alarm
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.slots.time is defined }}"
+          sequence:
+            - service: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.alarm_1_enabled
+            - service: tts.speak
+              data:
+                entity_id: media_player.bedside_clock
+                message: "Alarm for {{ trigger.slots.time }} cancelled"
+      # Cancel all alarms
+      default:
+        - service: input_boolean.turn_off
+          target:
+            entity_id:
+              - input_boolean.alarm_1_enabled
+              - input_boolean.alarm_2_enabled
+              - input_boolean.alarm_3_enabled
+        - service: tts.speak
+          data:
+            entity_id: media_player.bedside_clock
+            message: "All alarms cancelled"
+
+# Handle "List Alarms" intent
+- id: bedside_list_alarms
+  alias: "Bedside: List Alarms"
+  trigger:
+    - platform: conversation
+      command:
+        - "ListAlarms"
+  action:
+    - service: tts.speak
+      data:
+        entity_id: media_player.bedside_clock
+        message: >
+          {% set alarms = [] %}
+          {% if is_state('input_boolean.alarm_1_enabled', 'on') %}
+            {% set alarms = alarms + [state_attr('input_datetime.alarm_1', 'timestamp') | timestamp_custom('%I:%M %p')] %}
+          {% endif %}
+          {% if is_state('input_boolean.alarm_2_enabled', 'on') %}
+            {% set alarms = alarms + [state_attr('input_datetime.alarm_2', 'timestamp') | timestamp_custom('%I:%M %p')] %}
+          {% endif %}
+          {% if is_state('input_boolean.alarm_3_enabled', 'on') %}
+            {% set alarms = alarms + [state_attr('input_datetime.alarm_3', 'timestamp') | timestamp_custom('%I:%M %p')] %}
+          {% endif %}
+          {% if alarms | length > 0 %}
+            You have {{ alarms | length }} alarm{{ 's' if alarms | length > 1 else '' }} set for {{ alarms | join(', ') }}
+          {% else %}
+            You have no alarms set
+          {% endif %}
+
+# Trigger alarm when time matches
+- id: bedside_alarm_trigger
+  alias: "Bedside: Trigger Alarm"
+  trigger:
+    - platform: template
+      value_template: >
+        {% set now = now().strftime('%H:%M') %}
+        {% set alarm1 = states('input_datetime.alarm_1') %}
+        {% set alarm1_enabled = is_state('input_boolean.alarm_1_enabled', 'on') %}
+        {{ alarm1_enabled and now == alarm1 }}
+
+    - platform: template
+      value_template: >
+        {% set now = now().strftime('%H:%M') %}
+        {% set alarm2 = states('input_datetime.alarm_2') %}
+        {% set alarm2_enabled = is_state('input_boolean.alarm_2_enabled', 'on') %}
+        {{ alarm2_enabled and now == alarm2 }}
+
+    - platform: template
+      value_template: >
+        {% set now = now().strftime('%H:%M') %}
+        {% set alarm3 = states('input_datetime.alarm_3') %}
+        {% set alarm3_enabled = is_state('input_boolean.alarm_3_enabled', 'on') %}
+        {{ alarm3_enabled and now == alarm3 }}
+
+  action:
+    # Send MQTT message to Pi for local alarm playback
+    - service: mqtt.publish
+      data:
+        topic: "bedside_clock/alarm/trigger"
+        payload: "ON"
+
+    # Play alarm sound through media player
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.bedside_clock
+      data:
+        media_content_id: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"
+        media_content_type: "music"
+
+    # Gradually turn on bedroom lights
+    - service: light.turn_on
+      target:
+        entity_id: light.bedroom
+      data:
+        brightness: 255
+        transition: 300  # 5 minutes
+
+# Stop alarm on voice command or button press
+- id: bedside_stop_alarm
+  alias: "Bedside: Stop Alarm"
+  trigger:
+    - platform: conversation
+      command:
+        - "stop alarm"
+        - "dismiss alarm"
+        - "turn off alarm"
+
+    - platform: state
+      entity_id: input_button.stop_alarm
+      to: ~
+
+  action:
+    - service: mqtt.publish
+      data:
+        topic: "bedside_clock/alarm/stop"
+        payload: "OFF"
+
+    - service: media_player.media_stop
+      target:
+        entity_id: media_player.bedside_clock
+
+# Snooze alarm (9 minutes)
+- id: bedside_snooze_alarm
+  alias: "Bedside: Snooze Alarm"
+  trigger:
+    - platform: conversation
+      command:
+        - "snooze"
+        - "snooze alarm"
+
+  action:
+    - service: mqtt.publish
+      data:
+        topic: "bedside_clock/alarm/stop"
+        payload: "OFF"
+
+    - service: media_player.media_stop
+      target:
+        entity_id: media_player.bedside_clock
+
+    - delay:
+        minutes: 9
+
+    - service: automation.trigger
+      target:
+        entity_id: automation.bedside_alarm_trigger

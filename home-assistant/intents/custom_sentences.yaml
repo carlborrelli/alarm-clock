@@ -1,0 +1,251 @@
+# Custom Intent Sentences for Bedside Voice Clock
+# Place this file in your Home Assistant config/custom_sentences/en/ directory
+
+language: "en"
+intents:
+  # ============================================
+  # ALARM INTENTS
+  # ============================================
+  SetAlarm:
+    data:
+      - sentences:
+          - "set [an] alarm for {time}"
+          - "set [an] alarm at {time}"
+          - "wake me up at {time}"
+          - "set alarm for {time} on {days}"
+          - "set [an] alarm for {time} {days}"
+
+  CancelAlarm:
+    data:
+      - sentences:
+          - "cancel [the] [my] {time} alarm"
+          - "delete [the] [my] {time} alarm"
+          - "remove [the] [my] {time} alarm"
+          - "turn off [the] [my] {time} alarm"
+          - "cancel all alarms"
+          - "delete all alarms"
+
+  ListAlarms:
+    data:
+      - sentences:
+          - "what alarms [are] [do I have] set"
+          - "list [my] alarms"
+          - "what alarms do I have"
+          - "show [me] [my] alarms"
+          - "tell me my alarms"
+
+  # ============================================
+  # LIGHT CONTROL INTENTS
+  # ============================================
+  TurnOnLight:
+    data:
+      - sentences:
+          - "turn on [the] {room} light[s]"
+          - "turn [the] {room} light[s] on"
+          - "lights on in [the] {room}"
+          - "{room} lights on"
+
+  TurnOffLight:
+    data:
+      - sentences:
+          - "turn off [the] {room} light[s]"
+          - "turn [the] {room} light[s] off"
+          - "lights off in [the] {room}"
+          - "{room} lights off"
+
+  SetLightBrightness:
+    data:
+      - sentences:
+          - "set [the] {room} [light] [to] {brightness} percent"
+          - "dim [the] {room} [light] to {brightness} percent"
+          - "brightness [in] [the] {room} [to] {brightness} percent"
+          - "make [the] {room} {brightness} percent"
+
+  AllLightsOff:
+    data:
+      - sentences:
+          - "turn off all lights"
+          - "all lights off"
+          - "lights out"
+
+  # ============================================
+  # SCENE INTENTS
+  # ============================================
+  ActivateScene:
+    data:
+      - sentences:
+          - "activate {scene} mode"
+          - "turn on {scene} mode"
+          - "set {scene} mode"
+          - "{scene} mode"
+
+  # ============================================
+  # MUSIC/SPOTIFY INTENTS
+  # ============================================
+  PlayMusic:
+    data:
+      - sentences:
+          - "play [some] music"
+          - "play [my] {playlist} playlist"
+          - "play music by {artist}"
+          - "play {artist}"
+          - "play [the] [song] {song}"
+
+  PauseMusic:
+    data:
+      - sentences:
+          - "pause [the] music"
+          - "stop [the] music"
+          - "pause"
+
+  ResumeMusic:
+    data:
+      - sentences:
+          - "resume [the] music"
+          - "continue [playing]"
+          - "unpause"
+          - "play"
+
+  NextTrack:
+    data:
+      - sentences:
+          - "skip [this] [song] [track]"
+          - "next [song] [track]"
+          - "play next [song]"
+
+  PreviousTrack:
+    data:
+      - sentences:
+          - "previous [song] [track]"
+          - "go back"
+          - "last [song] [track]"
+
+  VolumeUp:
+    data:
+      - sentences:
+          - "volume up"
+          - "louder"
+          - "turn [it] up"
+          - "increase volume"
+
+  VolumeDown:
+    data:
+      - sentences:
+          - "volume down"
+          - "quieter"
+          - "turn [it] down"
+          - "decrease volume"
+          - "lower volume"
+
+  SetVolume:
+    data:
+      - sentences:
+          - "set volume [to] {volume} [percent]"
+          - "volume [to] {volume} [percent]"
+
+  # ============================================
+  # WEATHER INTENTS
+  # ============================================
+  GetWeather:
+    data:
+      - sentences:
+          - "what's the weather [like]"
+          - "how's the weather"
+          - "weather [report]"
+          - "tell me the weather"
+
+  GetForecast:
+    data:
+      - sentences:
+          - "what's the forecast [for] {when}"
+          - "weather [forecast] [for] {when}"
+          - "how's the weather {when}"
+          - "forecast [for] {when}"
+
+  # ============================================
+  # CALENDAR INTENTS
+  # ============================================
+  GetCalendar:
+    data:
+      - sentences:
+          - "what's on my calendar {when}"
+          - "what [do] I have {when}"
+          - "what's my schedule {when}"
+          - "calendar [for] {when}"
+          - "what [events] [do] I have {when}"
+
+  # ============================================
+  # TIME/DATE INTENTS
+  # ============================================
+  GetTime:
+    data:
+      - sentences:
+          - "what time is it"
+          - "what's the time"
+          - "tell me the time"
+          - "current time"
+
+  GetDate:
+    data:
+      - sentences:
+          - "what's the date"
+          - "what is today's date"
+          - "what day is it"
+          - "tell me the date"
+
+# ============================================
+# SLOT LISTS (Variables)
+# ============================================
+lists:
+  room:
+    values:
+      - "bedroom"
+      - "nightstand"
+      - "bedside"
+      - "living room"
+      - "bathroom"
+      - "kitchen"
+
+  scene:
+    values:
+      - "night"
+      - "morning"
+      - "sleep"
+      - "wake up"
+      - "reading"
+      - "movie"
+
+  days:
+    values:
+      - "weekdays"
+      - "weekends"
+      - "monday"
+      - "tuesday"
+      - "wednesday"
+      - "thursday"
+      - "friday"
+      - "saturday"
+      - "sunday"
+      - "every day"
+      - "daily"
+
+  when:
+    values:
+      - "today"
+      - "tomorrow"
+      - "this week"
+      - "next week"
+      - "this weekend"
+
+  brightness:
+    range:
+      from: 0
+      to: 100
+
+  volume:
+    range:
+      from: 0
+      to: 100
+
+# Time will be automatically parsed by Home Assistant
+# Examples: "6:30 AM", "seven thirty", "6 30", etc.

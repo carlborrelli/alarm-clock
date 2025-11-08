@@ -1,0 +1,129 @@
+# Media/Music Control Automations for Bedside Voice Clock
+
+# ============================================
+# MUSIC/SPOTIFY CONTROL
+# ============================================
+
+# Play music
+- id: bedside_play_music
+  alias: "Bedside: Play Music"
+  trigger:
+    - platform: conversation
+      command:
+        - "PlayMusic"
+  action:
+    - choose:
+        # Play specific playlist
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.slots.playlist is defined }}"
+          sequence:
+            - service: media_player.play_media
+              target:
+                entity_id: media_player.bedside_clock
+              data:
+                media_content_type: "playlist"
+                media_content_id: "spotify:playlist:{{ trigger.slots.playlist }}"
+
+        # Play specific artist
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.slots.artist is defined }}"
+          sequence:
+            - service: spotifyplus.search_artists
+              data:
+                entity_id: media_player.bedside_clock
+                criteria: "{{ trigger.slots.artist }}"
+                limit: 1
+
+      # Just play/resume
+      default:
+        - service: media_player.media_play
+          target:
+            entity_id: media_player.bedside_clock
+
+# Pause music
+- id: bedside_pause_music
+  alias: "Bedside: Pause Music"
+  trigger:
+    - platform: conversation
+      command:
+        - "PauseMusic"
+  action:
+    - service: media_player.media_pause
+      target:
+        entity_id: media_player.bedside_clock
+
+# Resume music
+- id: bedside_resume_music
+  alias: "Bedside: Resume Music"
+  trigger:
+    - platform: conversation
+      command:
+        - "ResumeMusic"
+  action:
+    - service: media_player.media_play
+      target:
+        entity_id: media_player.bedside_clock
+
+# Next track
+- id: bedside_next_track
+  alias: "Bedside: Next Track"
+  trigger:
+    - platform: conversation
+      command:
+        - "NextTrack"
+  action:
+    - service: media_player.media_next_track
+      target:
+        entity_id: media_player.bedside_clock
+
+# Previous track
+- id: bedside_previous_track
+  alias: "Bedside: Previous Track"
+  trigger:
+    - platform: conversation
+      command:
+        - "PreviousTrack"
+  action:
+    - service: media_player.media_previous_track
+      target:
+        entity_id: media_player.bedside_clock
+
+# Volume up
+- id: bedside_volume_up
+  alias: "Bedside: Volume Up"
+  trigger:
+    - platform: conversation
+      command:
+        - "VolumeUp"
+  action:
+    - service: media_player.volume_up
+      target:
+        entity_id: media_player.bedside_clock
+
+# Volume down
+- id: bedside_volume_down
+  alias: "Bedside: Volume Down"
+  trigger:
+    - platform: conversation
+      command:
+        - "VolumeDown"
+  action:
+    - service: media_player.volume_down
+      target:
+        entity_id: media_player.bedside_clock
+
+# Set specific volume
+- id: bedside_set_volume
+  alias: "Bedside: Set Volume"
+  trigger:
+    - platform: conversation
+      command:
+        - "SetVolume"
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.bedside_clock
+      data:
+        volume_level: "{{ trigger.slots.volume | int / 100 }}"

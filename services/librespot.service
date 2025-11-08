@@ -1,0 +1,39 @@
+[Unit]
+Description=Spotify Connect (librespot)
+After=sound.target network-online.target
+Wants=network-online.target sound.target
+
+[Service]
+Type=simple
+User={USER}
+WorkingDirectory={HOME}
+
+# Load config and run librespot
+EnvironmentFile={PROJECT_DIR}/app/config/librespot.conf
+ExecStart=/usr/local/bin/librespot \
+    --name "${DEVICE_NAME}" \
+    --device "${AUDIO_DEVICE}" \
+    --bitrate ${BITRATE} \
+    --cache "${CACHE_DIR}" \
+    --enable-volume-normalisation \
+    --initial-volume ${INITIAL_VOLUME} \
+    --volume-ctrl ${VOLUME_CTRL} \
+    --backend alsa \
+    --autoplay
+
+# Restart on failure
+Restart=always
+RestartSec=10
+
+# Resource limits
+Nice=-10
+CPUQuota=40%
+MemoryMax=300M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=librespot
+
+[Install]
+WantedBy=multi-user.target

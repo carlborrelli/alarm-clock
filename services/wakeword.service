@@ -1,0 +1,31 @@
+[Unit]
+Description=OpenWakeWord Detection Service
+After=sound.target network.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User={USER}
+WorkingDirectory={PROJECT_DIR}
+Environment="PATH={HOME}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+# Run the wake word detection script
+ExecStart={PROJECT_DIR}/venv/bin/python3 {PROJECT_DIR}/app/scripts/wakeword_runner.py
+
+# Restart on failure
+Restart=always
+RestartSec=5
+
+# Resource limits
+Nice=-5
+CPUQuota=30%
+MemoryMax=200M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wakeword
+
+[Install]
+WantedBy=multi-user.target
