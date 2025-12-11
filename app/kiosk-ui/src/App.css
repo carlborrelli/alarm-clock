@@ -8,21 +8,54 @@
   padding: 20px;
   position: relative;
   transition: opacity 0.5s ease;
+  cursor: default !important;
 }
 
-.app.dimmed {
-  opacity: 0.3;
+.app.dimmed .main-display {
+  display: none;
 }
 
-.dim-overlay {
+/* Fullscreen clock shown when dimmed */
+.dimmed-clock {
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  pointer-events: none;
+  background: #000;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
+}
+
+.app.dimmed .dimmed-clock {
+  display: flex;
+}
+
+.dimmed-clock .fullscreen-time {
+  font-size: 20vw;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -5px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-align: center;
+}
+
+.dimmed-clock .fullscreen-period {
+  font-size: 6vw;
+  opacity: 0.6;
+  margin-left: 20px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.dimmed-clock .fullscreen-date {
+  font-size: 3vw;
+  margin-top: 20px;
+  opacity: 0.5;
+  font-weight: 300;
 }
 
 .main-display {

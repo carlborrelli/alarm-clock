@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import './App.css';
 import Clock from './components/Clock';
 import Weather from './components/Weather';
@@ -12,6 +13,15 @@ function App() {
   const [isDimmed, setIsDimmed] = useState(false);
   const [brightness, setBrightness] = useState(config.display.normalBrightness);
   const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time for fullscreen clock
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle screen dimming based on time and inactivity
   useEffect(() => {
@@ -84,9 +94,18 @@ function App() {
         </div>
       </div>
 
-      {isDimmed && (
-        <div className="dim-overlay" />
-      )}
+      {/* Fullscreen clock shown when dimmed */}
+      <div className="dimmed-clock">
+        <div>
+          <div className="fullscreen-time">
+            {format(currentTime, 'h:mm')}
+            <span className="fullscreen-period">{format(currentTime, 'a')}</span>
+          </div>
+          <div className="fullscreen-date">
+            {format(currentTime, 'EEEE, MMMM d')}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

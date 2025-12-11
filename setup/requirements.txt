@@ -1,9 +1,9 @@
 # Python dependencies for Bedside Voice Clock
 
 # Wyoming protocol and wake word
-wyoming==1.5.3
+wyoming>=1.2.0
 openwakeword==0.5.1
-wyoming-openwakeword==1.8.2
+wyoming-openwakeword>=1.8.0
 
 # Audio processing
 pyaudio==0.2.14
